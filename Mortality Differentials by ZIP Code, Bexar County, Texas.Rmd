@@ -70,9 +70,13 @@ bexar.lm.df <- bexar.lm.df %>%
 
 bexar.fip = 48029
 choro = ZipChoropleth$new(rev(bexar.lm.df))
-choro$title = "Mortality Differentials e(65) of Cohort 1910-1919 by ZIP Code, Bexar County, Texas"
+#choro$title = "Mortality Differentials e(65) of Cohort 1910-1919 by ZIP Code, Bexar County, Texas"
 choro$set_zoom_zip(state_zoom = NULL, county_zoom = bexar.fip, msa_zoom = NULL, zip_zoom = NULL)
-bexar.plot <- choro$render() +
+p <- bexar.plot <- choro$render() +
     theme(text=element_text(size=15))+
-  scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")
+  scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")+
+  labs(title = "Mortality Differentials e(65) of Cohort 1910-1919",
+       subtitle = "Visualization by ZIP Code, Bexar County, Texas",
+       caption = "source: https://censoc.berkeley.edu/")
+p
 ```
