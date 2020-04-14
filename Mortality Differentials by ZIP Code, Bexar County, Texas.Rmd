@@ -9,12 +9,16 @@ output: html_document
 ## library packages
 library(haven)
 library(data.table)
+library(tidyverse)
 library(choroplethrZip)
 library(choroplethr)
+library(broom)
 library(viridis)
 ```
 
 ```{r}
+## Read in data
+load("C://Users/munta/Downloads/bunmd_v1/bunmd.Rdata")
 ```
 
 ```{r}
