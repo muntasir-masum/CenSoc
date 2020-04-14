@@ -1,0 +1,74 @@
+---
+title: "Mortality Differentials by ZIP Code"
+author: "Muntasir Masum"
+date: "4/13/2020"
+output: html_document
+---
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+## library packages
+library(haven)
+library(data.table)
+library(choroplethrZip)
+library(choroplethr)
+library(viridis)
+```
+
+```{r}
+```
+
+```{r}
+## Read ZIP Codes
+data("zip.regions")
+ 
+## Filter to  ZIP Codes in manhattan
+county <- c("bexar")
+
+bexar.zipcodes <- zip.regions %>%   
+  filter(state.name == "texas") %>% 
+  filter(county.name %in% county)
+
+## Select first 5 digits of zip_residence variable
+## filter to only include high coverage bexar ZIP Codes
+bunmd.bexar <- bunmd %>% 
+  mutate(zip5 = as.numeric(substr(zip_residence, 1, 5))) %>% 
+  filter(zip5 %in% bexar.zipcodes$region) %>% 
+  filter(byear %in% c(1910:1919)) %>% 
+  filter(dyear %in% 1988:2005)
+
+## prepare for regression
+bunmd.bexar <- bunmd.bexar %>% 
+  mutate(byear = as.factor(byear)) %>% 
+  mutate(byear = relevel(byear, ref = "1910")) %>% 
+  mutate(zip5 = as.factor(zip5)) %>% 
+  mutate(zip5 = relevel(zip5, ref = "78006"))
+```
+
+```{r}
+## Linear model predicting age at death from ZIP and byear 
+bexar.lm <- lm(death_age ~ zip5 +  byear,
+                     data = bunmd.bexar,
+                     weight = ccweight) 
+
+## Put model results into a data.frame 
+bexar.lm.df <- tidy(bexar.lm)
+
+## Select coefficients and ZIP Codes
+bexar.lm.df <- bexar.lm.df %>%
+  select(term, estimate) %>% 
+  filter(str_detect(term, "zip")) %>% 
+  mutate(zip = substr(term, 5, 9)) %>% 
+  select(region = zip, value = estimate)
+```
+
+```{r, warning=FALSE}
+## Plot Manhattan
+
+bexar.fip = 48029
+choro = ZipChoropleth$new(rev(bexar.lm.df))
+choro$title = "Mortality Differentials e(65) of Cohort 1910-1919 by ZIP Code, Bexar County, Texas"
+choro$set_zoom_zip(state_zoom = NULL, county_zoom = bexar.fip, msa_zoom = NULL, zip_zoom = NULL)
+bexar.plot <- choro$render() +
+    theme(text=element_text(size=15))+
+  scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")
+```
