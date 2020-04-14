@@ -77,6 +77,6 @@ p <- bexar.plot <- choro$render() +
   scale_fill_viridis(option="magma", discrete = "true", name="Difference in E65")+
   labs(title = "Mortality Differentials e(65) of Cohort 1910-1919",
        subtitle = "Visualization by ZIP Code, Bexar County, Texas",
-       caption = "source: https://censoc.berkeley.edu/")
+       caption = "Muntasir Masum @Muntasir_M | source: https://censoc.berkeley.edu/")
 p
 ```
